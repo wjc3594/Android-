@@ -1,19 +1,21 @@
 package com.example.a15711.kotlindemo
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.example.a15711.kotlindemo.ExtendClass.isBig
 import com.example.a15711.kotlindemo.StaticSingleInstance.CompanionClass
 import com.example.a15711.kotlindemo.StaticSingleInstance.SingleInstance
 import com.example.a15711.kotlindemo.StaticSingleInstance.test
-import kotlinx.android.synthetic.main.activity_main.*
+import com.example.a15711.kotlindemo.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        button.setOnClickListener {
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.btn.setOnClickListener {
             /**
              * run\with\apply
              */
@@ -23,7 +25,7 @@ class MainActivity : AppCompatActivity() {
             /***
              * 扩展类方法
              */
-            button.text = "wjc".isBig().toString()
+            binding.btn.text = "wjc".isBig().toString()
         }
         /**
          * 顶层方法
