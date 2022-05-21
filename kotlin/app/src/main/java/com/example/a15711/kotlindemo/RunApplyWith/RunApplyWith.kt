@@ -23,7 +23,7 @@ object RunApplyWith {
         toString()
     }
     /**
-     * run：lambda表达式中含有上下文，返回自身
+     * apply：lambda表达式中含有上下文，返回自身
      */
     val resultApply=StringBuilder().apply {
         append("I")
