@@ -6,6 +6,7 @@ import org.junit.Test
 
 import org.junit.Assert.*
 import java.lang.Thread.sleep
+import java.util.regex.Pattern
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -18,6 +19,22 @@ import kotlin.coroutines.suspendCoroutine
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
+        val str="data:image/png;base64,AAQSkZJRgABAQEASABIAAD2wBDAAoHBwgHBgoI"
+//        val res=Pattern.compile("data:.*/.*;base64,")
+        val index=str.indexOf(";base64,")
+
+        if(index!=-1){
+            println(str.substring(index+8))
+//            println(index)
+        }else{
+            println(str)
+        }
+//        val res=Pattern.compile("data:.*/.*;base64,")
+//        val result=str.split(res)
+//
+//        result.forEach {
+//            println("----$it")
+//        }
         //1.GlobalScope.launch
 //        GlobalScope.launch {
 //            delay(1500)
@@ -91,15 +108,30 @@ class ExampleUnitTest {
 //
 //        }
         //7.强制要求指定线程的协程
-        runBlocking {
-            withContext(Dispatchers.Default){
-                delay(1000)
-                println("withContext"+Thread.currentThread().id)
-            }
-        }
-        println("主线程id=${Thread.currentThread().id}")
+//        runBlocking {
+//            withContext(Dispatchers.Default){
+//                delay(1000)
+//                println("withContext"+Thread.currentThread().id)
+//            }
+//        }
+//        println("主线程id=${Thread.currentThread().id}")
 
-    }
+//        runBlocking {
+//            launch(Dispatchers.IO){
+//                println(Thread.currentThread().name)
+//                println("1")
+//            }
+//            println("11")
+//            launch(Dispatchers.IO){
+//                println(Thread.currentThread().name)
+//                println("2") }
+//            println("22")
+//            launch{
+//                println(Thread.currentThread().name)
+//                println("3") }
+//            println("33")
+        }
+
     suspend fun method1(){
         delay(1000)
         println("test  fdfda")

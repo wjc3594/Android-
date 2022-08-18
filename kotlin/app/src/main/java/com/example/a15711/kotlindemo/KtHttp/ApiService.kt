@@ -6,4 +6,9 @@ interface ApiService {
         @Field("lang") lang: String,
         @Field("since") since: String,
     ): RepoList
+    @Get("/repo")
+    fun reposAsync(
+        @Field("lang") lang: String,
+        @Field("since") since: String,
+    ): KtCallback<RepoList>
 }
