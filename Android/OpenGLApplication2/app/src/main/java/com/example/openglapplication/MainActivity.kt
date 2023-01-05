@@ -7,6 +7,7 @@ import android.opengl.Matrix
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.SystemClock
+import android.view.MotionEvent
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -28,12 +29,40 @@ class MainActivity : AppCompatActivity() {
 
     class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
         private val render: MyGLRender
+        private val TOUCH_SCALE_FACTOR: Float = 180.0f / 320f
+        private var previousX: Float = 0f
+        private var previousY: Float = 0f
 
         init {
             setEGLContextClientVersion(2)
             render = MyGLRender()
             setRenderer(render)
 //            renderMode = RENDERMODE_WHEN_DIRTY
+        }
+
+        override fun onTouchEvent(event: MotionEvent?): Boolean {
+            event?.let {
+                val x: Float = it.x
+                val y: Float = it.y
+                when (it.action) {
+                    MotionEvent.ACTION_MOVE -> {
+                        var dx: Float = x - previousX
+                        var dy: Float = y - previousY
+                        if (y > height / 2) {
+                            dx *= -1
+                        }
+                        if (x < width / 2) {
+                            dy *= -1
+                        }
+                        render.angle += (dx + dy) * TOUCH_SCALE_FACTOR
+                        requestRender()
+                    }
+                }
+                previousX = x
+                previousY = y
+                return true
+            }
+            return false
         }
     }
 
@@ -44,6 +73,9 @@ class MainActivity : AppCompatActivity() {
         private val projectionMatrix = FloatArray(16)
         private val viewMatrix = FloatArray(16)
         private val rotationMatrix = FloatArray(16)
+
+        @Volatile
+        var angle: Float = 0f
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
             mTriangle = Triangle()
@@ -61,8 +93,8 @@ class MainActivity : AppCompatActivity() {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
             Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -3f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
             Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
-            val time = SystemClock.uptimeMillis() % 4000L
-            val angle = 0.090f * time.toInt()
+//            val time = SystemClock.uptimeMillis() % 4000L
+//            val angle = 0.090f * time.toInt()
             Matrix.setRotateM(rotationMatrix, 0, angle, 0f, 0f, -1.0f)
             Matrix.multiplyMM(scratch, 0, vPMatrix, 0, rotationMatrix, 0)
             mTriangle.draw(scratch)
