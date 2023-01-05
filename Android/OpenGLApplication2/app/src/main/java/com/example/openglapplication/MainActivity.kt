@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.SystemClock
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -32,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             setEGLContextClientVersion(2)
             render = MyGLRender()
             setRenderer(render)
-            renderMode = RENDERMODE_WHEN_DIRTY
+//            renderMode = RENDERMODE_WHEN_DIRTY
         }
     }
 
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
         private val vPMatrix = FloatArray(16)
         private val projectionMatrix = FloatArray(16)
         private val viewMatrix = FloatArray(16)
+        private val rotationMatrix = FloatArray(16)
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
             mTriangle = Triangle()
@@ -55,10 +57,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onDrawFrame(gl: GL10?) {
+            val scratch = FloatArray(16)
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
             Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -3f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
             Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
-            mTriangle.draw(vPMatrix)
+            val time = SystemClock.uptimeMillis() % 4000L
+            val angle = 0.090f * time.toInt()
+            Matrix.setRotateM(rotationMatrix, 0, angle, 0f, 0f, -1.0f)
+            Matrix.multiplyMM(scratch, 0, vPMatrix, 0, rotationMatrix, 0)
+            mTriangle.draw(scratch)
         }
 
 
