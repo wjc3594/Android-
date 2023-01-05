@@ -56,6 +56,9 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * 定义形状 https://developer.android.google.cn/training/graphics/opengl/shapes
+     */
     class Triangle {
         private val vertexShaderCode =
             "attribute vec4 vPosition;" +
