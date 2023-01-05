@@ -3,6 +3,7 @@ package com.example.openglapplication
 import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
+import android.opengl.Matrix
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import java.nio.ByteBuffer
@@ -38,6 +39,9 @@ class MainActivity : AppCompatActivity() {
     class MyGLRender : GLSurfaceView.Renderer {
         private lateinit var mTriangle: Triangle
         private lateinit var mSquare: Square2
+        private val vPMatrix = FloatArray(16)
+        private val projectionMatrix = FloatArray(16)
+        private val viewMatrix = FloatArray(16)
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
             mTriangle = Triangle()
@@ -46,11 +50,15 @@ class MainActivity : AppCompatActivity() {
 
         override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
             GLES20.glViewport(0, 0, width, height)
+            val ratio = width.toFloat() / height.toFloat()
+            Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
         }
 
         override fun onDrawFrame(gl: GL10?) {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-            mTriangle.draw()
+            Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -3f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
+            Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
+            mTriangle.draw(vPMatrix)
         }
 
 
@@ -61,10 +69,19 @@ class MainActivity : AppCompatActivity() {
      */
     class Triangle {
         private val vertexShaderCode =
-            "attribute vec4 vPosition;" +
+        // This matrix member variable provides a hook to manipulate
+            // the coordinates of the objects that use this vertex shader
+            "uniform mat4 uMVPMatrix;" +
+                    "attribute vec4 vPosition;" +
                     "void main() {" +
-                    "  gl_Position = vPosition;" +
+                    // the matrix must be included as a modifier of gl_Position
+                    // Note that the uMVPMatrix factor *must be first* in order
+                    // for the matrix multiplication product to be correct.
+                    "  gl_Position = uMVPMatrix * vPosition;" +
                     "}"
+
+        // Use to access and set the view transformation
+        private var vPMatrixHandle: Int = 0
 
         private val fragmentShaderCode =
             "precision mediump float;" +
@@ -116,7 +133,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fun draw() {
+        fun draw(mvpMatrix: FloatArray) {
+            vPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix")
+            GLES20.glUniformMatrix4fv(vPMatrixHandle, 1, false, mvpMatrix, 0)
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount)
+            GLES20.glDisableVertexAttribArray(positionHandle)
             GLES20.glUseProgram(mProgram)
             positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition").also {
                 GLES20.glEnableVertexAttribArray(it)
