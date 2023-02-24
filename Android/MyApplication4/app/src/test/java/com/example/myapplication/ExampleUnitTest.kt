@@ -15,22 +15,14 @@ class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
 //        assertEquals(4, 2 + 2)\
-        val a1=A(1)
-        val a2=A(2)
-        val a3=A(3)
-        val list= mutableListOf<A>()
-        list.add(a3)
-        list.add(a2)
-        list.add(a1)
-        list.forEach {
-            println(it.time)
-        }
-        println("-------------")
-        list.sortBy { it.time }
-        list.forEach {
-            println(it.time)
-        }
+        A.bb()
     }
-    class A(var time:Long){
+    object A{
+        init {
+            println("init")
+        }
+        fun bb(){
+            println("bb")
+        }
     }
 }
