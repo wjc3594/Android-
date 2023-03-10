@@ -16,11 +16,16 @@ class ExampleUnitTest {
     fun addition_isCorrect() {
 //        assertEquals(4, 2 + 2)\
         A.bb()
+        val b="99999"
+        val c=(A.a!=b)
+        println(c)
     }
     object A{
         init {
             println("init")
         }
+
+        val a="99999"
         fun bb(){
             println("bb")
         }
