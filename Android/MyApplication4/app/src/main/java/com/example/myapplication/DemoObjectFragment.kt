@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 
 const val ARG_OBJECT = "object"
 
@@ -42,6 +43,13 @@ class DemoObjectFragment : Fragment() {
         arguments?.takeIf { it.containsKey(ARG_OBJECT) }?.apply {
             val tv = view.findViewById<TextView>(R.id.text1)
             tv.text = getInt(ARG_OBJECT).toString()
+            tv.setOnClickListener {
+                Toast.makeText(activity,"点击",Toast.LENGTH_SHORT).show()
+            }
+            tv.setOnLongClickListener{
+                Toast.makeText(activity,"长按",Toast.LENGTH_SHORT).show()
+                return@setOnLongClickListener true
+            }
         }
     }
 
